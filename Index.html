@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Management App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background: #f5f7fb;
+    }
+    header {
+      background: #0047ab;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 { color: #0047ab; }
+    input, button, select {
+      width: 100%; padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #0047ab;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { background: #003580; }
+    .hidden { display: none; }
+    .student-card {
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📘 College Management - Chatbook</h1>
+  </header>
+
+  <div class="container" id="loginPage">
+    <h2>Login</h2>
+    <select id="role">
+      <option value="student">Student</option>
+      <option value="admin">Admin</option>
+    </select>
+    <input type="text" id="username" placeholder="Username / Student ID">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div class="container hidden" id="studentDashboard">
+    <h2>👨‍🎓 Student Dashboard</h2>
+    <p><b>ID:</b> <span id="sId"></span></p>
+    <p><b>Name:</b> <span id="sName"></span></p>
+    <p><b>Phone:</b> <span id="sPhone"></span></p>
+    <h3>📅 Attendance</h3>
+    <ul id="sAttendance"></ul>
+    <h3>📊 Results</h3>
+    <ul id="sResults"></ul>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="container hidden" id="adminDashboard">
+    <h2>🛠 Admin Dashboard</h2>
+    <h3>➕ Add Student</h3>
+    <input type="text" id="newId" placeholder="Student ID">
+    <input type="text" id="newName" placeholder="Full Name">
+    <input type="text" id="newPhone" placeholder="Phone Number">
+    <button onclick="addStudent()">Add Student</button>
+    <h3>👥 Students</h3>
+    <div id="studentList"></div>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    // Demo data
+    const students = [
+      {
+        id: "S001", name: "Ravi Kumar", phone: "9876543210",
+        attendance: ["Present - 01/09", "Absent - 02/09", "Present - 03/09"],
+        results: ["Sem1: 75%", "Sem2: 82%"],
+        password: "1234"
+      }
+    ];
+
+    const admin = { username: "admin", password: "admin123" };
+
+    function login() {
+      const role = document.getElementById("role").value;
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      if (role === "student") {
+        const stu = students.find(s => s.id === user && s.password === pass);
+        if (stu) {
+          document.getElementById("loginPage").classList.add("hidden");
+          document.getElementById("studentDashboard").classList.remove("hidden");
+          document.getElementById("sId").innerText = stu.id;
+          document.getElementById("sName").innerText = stu.name;
+          document.getElementById("sPhone").innerText = stu.phone;
+          document.getElementById("sAttendance").innerHTML =
+            stu.attendance.map(a => `<li>${a}</li>`).join("");
+          document.getElementById("sResults").innerHTML =
+            stu.results.map(r => `<li>${r}</li>`).join("");
+        } else {
+          alert("Invalid student credentials");
+        }
+      } else if (role === "admin") {
+        if (user === admin.username && pass === admin.password) {
+          document.getElementById("loginPage").classList.add("hidden");
+          document.getElementById("adminDashboard").classList.remove("hidden");
+          renderStudents();
+        } else {
+          alert("Invalid admin credentials");
+        }
+      }
+    }
+
+    function logout() {
+      document.getElementById("studentDashboard").classList.add("hidden");
+      document.getElementById("adminDashboard").classList.add("hidden");
+      document.getElementById("loginPage").classList.remove("hidden");
+    }
+
+    function addStudent() {
+      const id = document.getElementById("newId").value;
+      const name = document.getElementById("newName").value;
+      const phone = document.getElementById("newPhone").value;
+      if (id && name && phone) {
